@@ -96,6 +96,7 @@ pipeline {
             // Actions to always execute, e.g., send notifications
             // For example, you might want to notify a Slack channel if the build fails:
             // slackSend (color: '#FF0000', message: "Build failed: ${env.BUILD_URL}")
+                echo 'This will always run after the pipeline execution, regardless of the result.'
         }
     }
 }
