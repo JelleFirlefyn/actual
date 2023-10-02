@@ -7,34 +7,95 @@ pipeline {
                 checkout scm
             }
         }
-        
+
         stage('SBOM Creation') {
             steps {
-                // Invoke your SBOM tool, e.g., CycloneDX
+                script {
+                    // Invoke your SBOM tool, e.g., CycloneDX
+                    sh 'path-to-cyclonedx --input your-input --output your-output'
+                }
             }
         }
 
         stage('Software Composition Analysis') {
             steps {
-                // Invoke tools like OWASP Dependency-Check
+                script {
+                    // Invoke tools like OWASP Dependency-Check
+                    sh 'dependency-check --project YourProject --scan ./ --out reports'
+                }
             }
         }
 
-        // ... Repeat similar blocks for other security tests ...
+        stage('Container Scanning') {
+            steps {
+                script {
+                    // Scan your container image with Trivy
+                    sh 'trivy image your-image-name:tag'
+                }
+            }
+        }
+
+        stage('Repo Scanning') {
+            steps {
+                script {
+                    // Use GitLeaks to scan your repository
+                    sh 'gitleaks --path=/path-to-your-repo --verbose'
+                }
+            }
+        }
+
+        stage('Static Analysis') {
+            steps {
+                script {
+                    // Invoke your SAST tool, e.g., SonarQube scanner
+                    sh 'sonar-scanner'
+                }
+            }
+        }
+
+        stage('Dynamic Analysis') {
+            steps {
+                script {
+                    // Invoke your DAST tool, e.g., OWASP ZAP
+                    // You'd usually configure ZAP as a proxy, then run tests through it.
+                    sh 'path-to-your-zap-cli-command'
+                }
+            }
+        }
+
+        stage('Secret Management') {
+            steps {
+                script {
+                    // Fetch secrets from HashiCorp Vault
+                    sh 'vault read secret/data/your-secret-path'
+                }
+            }
+        }
+
+        stage('Code Signing') {
+            steps {
+                script {
+                    // Sign your code or artifact using GPG
+                    sh 'gpg --output your-output --detach-sig your-file'
+                }
+            }
+        }
 
         stage('Deploy') {
-            when { 
-                // Define your conditions for deployment, e.g., all security checks pass
-            }
             steps {
-                // Deployment steps
+                script {
+                    // Your deployment steps here
+                    sh './your-deployment-script.sh'
+                }
             }
         }
     }
 
     post {
         always {
-            // Actions you want to always execute, e.g., notifications
+            // Actions to always execute, e.g., send notifications
+            // For example, you might want to notify a Slack channel if the build fails:
+            // slackSend (color: '#FF0000', message: "Build failed: ${env.BUILD_URL}")
         }
     }
 }
